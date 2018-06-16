@@ -1,0 +1,52 @@
+Dataset <- read.csv(file.choose(),header = TRUE)
+Data<-Dataset
+dataset = dataset[3:5]
+
+# Encoding the target feature as factor
+Data$Outcome = factor(Data$Outcome, levels = c(0, 1))
+Data$Outcome = factor(Data$Outcome,
+                         levels = c('Paid', 'Defaulted'),
+                         labels = c(0, 1))
+library(caTools)
+set.seed(123)
+split = sample.split(Data$Outcome, SplitRatio = 0.80)
+training_set = subset(Data, split == TRUE)
+test_set = subset(Data, split == FALSE)
+training_set[-3] = scale(training_set[-3])
+test_set[-3] = scale(test_set[-3])
+
+# Fitting Decision Tree Classification to the Training set
+library(rpart)
+classifier = rpart(formula = Outcome ~ .,
+                   data = training_set)
+summary (classifier)
+
+Predictor = predict(classifier, newdata = test_set[-11], type = 'class')
+Predictor
+
+cm = table(test_set[, 11], Predictor)
+cm
+
+Summary(Predictor)
+printcp(classifier)
+printcp(Predictor)
+plotcp(classifier)
+summary(classifier)
+summary(cm)
+plot(classifier)
+
+plot(classifier, uniform=TRUE, 
+     main="Classification Tree Customers")
+text(classifier, use.n=TRUE, all=TRUE, cex=.8)
+
+# Plotting the tree
+plot(classifier)
+plot(classifier, uniform=TRUE, 
+     main="Classification Tree Customers")
+text(classifier)
+plot(Predictor, uniform=TRUE, 
+     main="Classification Tree Customers")
+text(Predictor, use.n=TRUE, all=TRUE, cex=.8)
+plot(classifier, uniform=TRUE, 
+     main="Classification Tree Customers")
+text(classifier, use.n=TRUE, all=TRUE, cex=.8)
